@@ -35,15 +35,15 @@ data class AdvancedAvatarSpec(
 ) {
 
     /**
-     * Builds a clean, structured prompt token that generation pipelines can use.
-     * When isNudeEnabled = true it forces full anatomical / fine-art nude description.
-     * Designed to match the photoreal + explicit style of the goal reference images.
+     * Builds a high-quality prompt token designed for the photoreal / explicit style
+     * shown in the goal reference images (nude, lingerie, cosplay, detailed anatomy).
+     * When isNudeEnabled = true it forces full anatomical detail with classical lighting.
      */
     fun toAbstractedPromptToken(): String {
         val clothingDesc = if (isNudeEnabled) {
-            "completely nude, fully exposed body, detailed anatomy, natural skin texture, fine-art classical lighting, high-detail photorealistic nude portrait"
+            "completely nude, fully exposed body, detailed female anatomy, natural skin texture with subtle pores and highlights, fine-art classical lighting, high-detail photorealistic nude portrait, no clothing, no fabric"
         } else {
-            "wearing $currentOutfit"
+            "wearing $currentOutfit, detailed fabric texture, realistic clothing folds"
         }
 
         val inkDesc = if (tattoosAndPiercings.isNotEmpty() &&
@@ -55,21 +55,22 @@ data class AdvancedAvatarSpec(
         }
 
         val refTag = if (!referenceImagePath.isNullOrEmpty()) {
-            "reference image active"
+            "using reference image for face consistency"
         } else {
             "no reference image"
         }
 
         return buildString {
-            append("(masterpiece, best quality, photorealistic, ultra detailed), ")
+            append("(masterpiece, best quality, photorealistic, ultra detailed, 8k, sharp focus), ")
             append("$age year old $race woman, ")
-            append("$heightStature, $bodyType body, $breastSize breasts, $waistHipRatio, ")
+            append("$heightStature, $bodyType body type, $breastSize breasts, $waistHipRatio figure, ")
             append("$skinTexture skin, $facialStructure face, $lipShape lips, ")
             append("$eyeColor eyes, $hairStyle $hairColor hair, ")
             append("$makeupStyle makeup, $expressionVibe expression, ")
             append("$clothingDesc, ")
             append("$inkDesc, ")
             append("background: $backgroundVibe, ")
+            append("cinematic lighting, realistic skin subsurface scattering, ")
             append("($refTag)")
         }
     }
@@ -78,5 +79,10 @@ data class AdvancedAvatarSpec(
     fun toShortSummary(): String {
         val nudeTag = if (isNudeEnabled) " • NUDE" else ""
         return "$name • $age • $race • $bodyType • $breastSize$nudeTag"
+    }
+
+    /** Even shorter label for chips / lists */
+    fun toChipLabel(): String {
+        return if (isNudeEnabled) "$name (Nude)" else name
     }
 }
