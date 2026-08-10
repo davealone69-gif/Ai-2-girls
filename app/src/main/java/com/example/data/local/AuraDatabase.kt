@@ -5,9 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.data.local.dao.ChatDao
+import com.example.data.local.dao.LocalAvatarDao
 import com.example.data.local.dao.PersonaDao
 import com.example.data.local.dao.SwarmLogDao
 import com.example.data.local.entities.*
+import com.example.data.local.entity.LocalAvatarEntity
 
 @Database(
     entities = [
@@ -15,9 +17,10 @@ import com.example.data.local.entities.*
         PersonaEntity::class,
         SwarmLogEntity::class,
         UserEntity::class,
-        MediaAssetEntity::class
+        MediaAssetEntity::class,
+        LocalAvatarEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AuraDatabase : RoomDatabase() {
@@ -25,6 +28,7 @@ abstract class AuraDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
     abstract fun personaDao(): PersonaDao
     abstract fun swarmLogDao(): SwarmLogDao
+    abstract fun localAvatarDao(): LocalAvatarDao
 
     companion object {
         @Volatile
