@@ -111,6 +111,16 @@ fun AvatarCreatorScreen(
         "Pouty Full",
         "Classic Curved"
     )
+    val eyeColors = listOf(
+        "Amber Gold",
+        "Emerald Green",
+        "Sapphire Blue",
+        "Ice Blue",
+        "Dark Brown",
+        "Hazel",
+        "Violet",
+        "Grey"
+    )
     val expressions = listOf(
         "Seductive / Smoldering",
         "Playful & Mischievous",
@@ -213,6 +223,7 @@ fun AvatarCreatorScreen(
                         skinTexture = skinTextures.random(),
                         facialStructure = facialStructures.random(),
                         lipShape = lipShapes.random(),
+                        eyeColor = eyeColors.random(),
                         expressionVibe = expressions.random(),
                         makeupStyle = makeupStyles.random(),
                         hairColor = hairColors.random(),
@@ -429,6 +440,10 @@ fun AvatarCreatorScreen(
 
         AttributeCategorySection("Lips", lipShapes, advSpec.lipShape,
             { viewModel.updateAdvancedAvatarSpec(lipShape = it) }, "lip_shape")
+        Spacer(modifier = Modifier.height(14.dp))
+
+        AttributeCategorySection("Eye Colour", eyeColors, advSpec.eyeColor,
+            { viewModel.updateAdvancedAvatarSpec(eyeColor = it) }, "eye_color")
         Spacer(modifier = Modifier.height(14.dp))
 
         AttributeCategorySection("Expression", expressions, advSpec.expressionVibe,
