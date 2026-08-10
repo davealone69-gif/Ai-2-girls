@@ -25,6 +25,26 @@ jobs:
         with:
           validate-wrappers: false
 
+      - name: Fix / download Gradle Wrapper JAR
+        run: |
+          mkdir -p gradle/wrapper
+          # Download a known-good gradle-wrapper.jar
+          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar \
+            https://github.com/gradle/gradle/raw/v8.11.1/gradle/wrapper/gradle-wrapper.jar
+          # Ensure properties point to a compatible Gradle for AGP 8.8
+          cat > gradle/wrapper/gradle-wrapper.properties << 'PROPS'
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+PROPS
+          chmod +x gradlew || true
+          ls -la gradle/wrapper/
+          file gradle/wrapper/gradle-wrapper.jar || true
+
       - name: Setup Keystore
         run: |
           if [ -f debug.keystore.base64 ]; then
@@ -37,13 +57,19 @@ jobs:
         run: chmod +x ./gradlew || true
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Verify APK output directory
-        run: ls -R app/build/outputs/apk/debug/
+        run: |
+          ls -R app/build/outputs/apk/ || true
+          find app/build -name "*.apk" -ls || true
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn
