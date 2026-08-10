@@ -25,25 +25,20 @@ jobs:
         with:
           validate-wrappers: false
 
-      - name: Fix / download Gradle Wrapper JAR
+      - name: Fix corrupt Gradle Wrapper JAR
         run: |
           mkdir -p gradle/wrapper
-          # Download a known-good gradle-wrapper.jar
-          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar \
-            https://github.com/gradle/gradle/raw/v8.11.1/gradle/wrapper/gradle-wrapper.jar
-          # Ensure properties point to a compatible Gradle for AGP 8.8
-          cat > gradle/wrapper/gradle-wrapper.properties << 'PROPS'
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.11.1-bin.zip
-networkTimeout=10000
-validateDistributionUrl=true
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-PROPS
+          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.11.1/gradle/wrapper/gradle-wrapper.jar
+          echo 'distributionBase=GRADLE_USER_HOME' > gradle/wrapper/gradle-wrapper.properties
+          echo 'distributionPath=wrapper/dists' >> gradle/wrapper/gradle-wrapper.properties
+          echo 'distributionUrl=https\://services.gradle.org/distributions/gradle-8.11.1-bin.zip' >> gradle/wrapper/gradle-wrapper.properties
+          echo 'networkTimeout=10000' >> gradle/wrapper/gradle-wrapper.properties
+          echo 'validateDistributionUrl=true' >> gradle/wrapper/gradle-wrapper.properties
+          echo 'zipStoreBase=GRADLE_USER_HOME' >> gradle/wrapper/gradle-wrapper.properties
+          echo 'zipStorePath=wrapper/dists' >> gradle/wrapper/gradle-wrapper.properties
           chmod +x gradlew || true
           ls -la gradle/wrapper/
-          file gradle/wrapper/gradle-wrapper.jar || true
+          java -jar gradle/wrapper/gradle-wrapper.jar --help || true
 
       - name: Setup Keystore
         run: |
