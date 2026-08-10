@@ -25,20 +25,13 @@ jobs:
         with:
           validate-wrappers: false
 
-      - name: Fix corrupt Gradle Wrapper JAR
+      - name: Regenerate Gradle Wrapper with system Gradle
         run: |
-          mkdir -p gradle/wrapper
-          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.11.1/gradle/wrapper/gradle-wrapper.jar
-          echo 'distributionBase=GRADLE_USER_HOME' > gradle/wrapper/gradle-wrapper.properties
-          echo 'distributionPath=wrapper/dists' >> gradle/wrapper/gradle-wrapper.properties
-          echo 'distributionUrl=https\://services.gradle.org/distributions/gradle-8.11.1-bin.zip' >> gradle/wrapper/gradle-wrapper.properties
-          echo 'networkTimeout=10000' >> gradle/wrapper/gradle-wrapper.properties
-          echo 'validateDistributionUrl=true' >> gradle/wrapper/gradle-wrapper.properties
-          echo 'zipStoreBase=GRADLE_USER_HOME' >> gradle/wrapper/gradle-wrapper.properties
-          echo 'zipStorePath=wrapper/dists' >> gradle/wrapper/gradle-wrapper.properties
-          chmod +x gradlew || true
+          # Use the Gradle already available on the runner to generate a correct wrapper
+          gradle wrapper --gradle-version 8.11.1
+          chmod +x gradlew
           ls -la gradle/wrapper/
-          java -jar gradle/wrapper/gradle-wrapper.jar --help || true
+          head -5 gradle/wrapper/gradle-wrapper.properties
 
       - name: Setup Keystore
         run: |
@@ -47,9 +40,6 @@ jobs:
           elif [ ! -f debug.keystore ]; then
             keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
-
-      - name: Grant execute permission to Gradle
-        run: chmod +x ./gradlew || true
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
